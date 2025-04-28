@@ -1,86 +1,35 @@
 import { useEffect, useState } from 'react';
 import { message } from 'antd'
-import { website } from '@/consts'
-import { delay } from '@/utils/utils';
-const REALTIME_LIST_STACK_MAX = 100;
+import { getResult } from '@/services/api';
 
 export default () => {
     const [orderCount, setOrderCount] = useState<number>();
     const [exceptionOrderCount, setExceptionOrderCount] = useState<number>();
     const [result, setResult] = useState<any[]>([]);
-    const [processResult, setProcessResult] = useState<any>({});
+    const [processResult, setProcessResult] = useState<any>({
+        top: [
+            { img: 'https://ts1.tc.mm.bing.net/th/id/R-C.a61375d0a83d84bb2352d0323c1e6fc1?rik=S5EjClrvbvK4Hg&riu=http%3a%2f%2fpic.ntimg.cn%2ffile%2f20180131%2f17961491_115843933000_2.jpg&ehk=eUeG0XIQiyKijvzBdLQC7atp8XUQXVo51Cn%2b29R0qtM%3d&risl=&pid=ImgRaw&r=0', x1: 0.1, y1: 0.1, x2: 0.5, y2: 0.4, radio: 0 }
+        ],
+        left: [
+            { img: 'https://ts2.tc.mm.bing.net/th/id/R-C.a61375d0a83d84bb2352d0323c1e6fc1?rik=S5EjClrvbvK4Hg&riu=http%3a%2f%2fpic.ntimg.cn%2ffile%2f20180131%2f17961491_115843933000_2.jpg&ehk=eUeG0XIQiyKijvzBdLQC7atp8XUQXVo51Cn%2b29R0qtM%3d&risl=&pid=ImgRaw&r=0', x1: 0.1, y1: 0.1, x2: 0.5, y2: 0.4, radio: 0 }
+        ],
+        right: [
+            { img: 'https://ts3.tc.mm.bing.net/th/id/R-C.a61375d0a83d84bb2352d0323c1e6fc1?rik=S5EjClrvbvK4Hg&riu=http%3a%2f%2fpic.ntimg.cn%2ffile%2f20180131%2f17961491_115843933000_2.jpg&ehk=eUeG0XIQiyKijvzBdLQC7atp8XUQXVo51Cn%2b29R0qtM%3d&risl=&pid=ImgRaw&r=0', x1: 0.1, y1: 0.1, x2: 0.5, y2: 0.4, radio: 0 }
+        ]
+    });
     const [processResultTimes, setProcessResultTimes] = useState(0);
     const [pageNum, setPage] = useState<number>(1);
-    const [ws, setWs] = useState<any>();
-    const [inited, setInited] = useState<boolean>(false);
 
     const init = async () => {
         if (location.hash?.indexOf('realtime') < 0) return;
-        setProcessResult({})
-        console.log('version 0.0.4 2022-01-07 v2')
-        if (window['ws']) return;
-        await delay(1000)
-        try {
-            setWs(new WebSocket(website.socket));
-        } catch (e) {
-            console.error(e)
-        }
-        console.log("ws: connecting...");
-    }
-
-    const removeInit = () => {
-        ws && ws.close();
-    }
-
-    useEffect(() => {
-        if (ws) {
-            ws.onopen = () => {
-                console.log("ws: connected!");
-                window['ws'] = ws;
-            }
-            ws.onmessage = (msg) => {
-                let data;
-                try {
-                    data = JSON.parse(msg.data);
-                } catch (e) {
-                    console.error(data);
-                }
-                if (!data) {
-                    message.error("实时数据解析错误!");
-                    return;
-                }
-                console.log('ws data:', data)
-                const { orderCount, exceptionOrderCount, imgList, type = '', } = data;
-                if (type === 'POST_PROCESS') {
-                    setProcessResult(data);
-                    setProcessResultTimes(0);
-                } else {
-                    setProcessResult({});
-                    setOrderCount(orderCount);
-                    setExceptionOrderCount(exceptionOrderCount);
-                    if (!inited) {
-                        setInited(true);
-                        setResult(imgList);
-                        setPage(1);
-                    } else {
-                        setResult([...imgList, ...result].slice(
-                            0,
-                            REALTIME_LIST_STACK_MAX
-                        ));
-                    }
-                }
-            }
-            ws.onerror = () => {
-                setInited(false);
-                init();
-            }
-            ws.onclose = () => {
-                console.error("ws:disconnected!");
-                window['ws'] = undefined;
-                setInited(false);
+        getResult().then(res => {
+            if (res?.code === 200) {
+                setProcessResult(res.data);
+            } else {
+                message.error(res?.message || '获取结果失败');
             };
-        }
-    }, [result, ws, inited]);
+        });
+    };
 
     return {
         orderCount, setOrderCount,
@@ -88,6 +37,6 @@ export default () => {
         result, setResult,
         processResult, processResultTimes, setProcessResultTimes,
         pageNum, setPage,
-        init, removeInit
-    }
+        init
+    };
 }

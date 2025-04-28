@@ -1,4 +1,5 @@
 import { message } from "antd";
+import * as _ from 'lodash';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -111,8 +112,53 @@ export function formatTimeToDate(date = 0) {
     if (Number(s) > 0) {
         result += `${s}秒`;
     }
-    if(!result){
+    if (!result) {
         result = '< 1秒'
     }
     return result;
+}
+/** *
+ * 将params转为 a=b&c=d 格式
+ * @param params
+ */
+export function parseParamsToUrl(params: any) {
+    let queryParam: any = '';
+    if (params) {
+        const keys = Object.keys(params);
+
+        keys.forEach?.((key) => {
+            const _value = typeof params[key] === 'object' ? JSON.stringify(params[key]) : params[key];
+            if (!_value) return;
+            queryParam = queryParam ? `${queryParam}&${key}=${_value}` : `${key}=${_value}`;
+        });
+    }
+    return queryParam;
+}
+// 后端接口返回数据格式化
+export function formatResponse(res: any) {
+    if (res.data && _.isObject(res.data)) {
+        for (const key in res.data) {
+            switch (key) {
+                case 'error_code':
+                    res.data.code = res.data.error_code;
+                    if (res.data.error_code == '000000') {
+                        res.data.code = 100000;
+                    }
+                    delete res.data.error_code;
+                    break;
+                case 'error_msg':
+                    res.data.msg = res.data.error_msg;
+                    if (res.data.error_msg == '请求成功') {
+                        res.data.status = 'success';
+                    } else {
+                        res.data.status = 'failed';
+                    }
+                    delete res.data.error_msg;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    return res;
 }

@@ -31,41 +31,28 @@ const History = () => {
     const [form] = Form.useForm();
     const { height } = useResize();
     const {
-        setReady, setOrderQuery, imgQuery, setImgQuery, orderList, loadImgList,
-        loadOrderList, unmount, handleViewOrder, setImgDrawerVisible, setCurrentOrderId,
-        handleOrderDetail, processResult, setProcessResult, loadMaterialList,
+        setOrderQuery, orderList, loadOrderList,
     } = useModel('history' as any);
     const query = history?.location?.query || {};
     const [curHeight, setCurHeight] = useState<number>(height);
     const [imgModalData, setImgModalData] = useState<any>({});
 
-    useEffect(() => unmount, []);
+    useEffect(() => {
+        loadOrderList({ pageNum: 1, pageSize: 20, })
+    }, []);
     useEffect(() => {
         if (query.orderNo) {
             setOrderQuery({ orderNo: query.orderNo });
             form.setFieldsValue({ orderNo: query.orderNo });
-            setCurrentOrderId(query.orderNo);
-            if (query.id) {
-                setImgDrawerVisible(true);
-                setImgQuery({
-                    ...imgQuery,
-                    imgId: query.id
-                });
-                loadImgList({ orderNo: query.orderNo }, true);
-            }
         }
-        setReady(true)
-        // return unmount()
     }, [query, form]);
     useEffect(() => {
         setCurHeight(Math.max(height, 700));
     }, [height]);
 
-    useEffect(() => {
-        if (isObject(processResult) && !isEmpty(processResult)) {
-            setImgModalData(Object.assign({}, processResult))
-        }
-    }, [processResult]);
+    const handleViewOrder = (order) => {
+        setImgModalData(Object.assign({}, order));
+    };
 
     const columns = [
         { key: 'index', dataIndex: 'index', title: '序号', width: 50, align: 'center' },
@@ -87,36 +74,15 @@ const History = () => {
                 return moment(text).format('YYYY-MM-DD HH:mm:ss');
             }
         },
-        {
-            key: 'orderRunTime', dataIndex: 'orderRunTime', title: '运行时长', width: 130, render: (text, record) => {
-                const { orderTime = 0, orderUpdateTime = 0 } = record;
-                return formatTimeToDate(Number(orderUpdateTime) - Number(orderTime));
-            }
-        },
         { key: 'materialName', dataIndex: 'materialName', title: '型号' },
         { key: 'alarmImgCount', dataIndex: 'alarmImgCount', title: '报警图片数量', width: 108, className: "col-alarm" },
         { key: 'falsyAlarmImgCount', dataIndex: 'falsyAlarmImgCount', title: '误报图片数量', width: 108, className: "col-falsy" },
         { key: 'confirmedAlarmImgCount', dataIndex: 'confirmedAlarmImgCount', title: '异常图片数量', width: 108, className: "col-confirmed" },
         {
-            key: 'auditedImgCount', dataIndex: 'auditedImgCount', title: '审核进度', width: 80,
-            render: (auditedImgCount, { alarmImgCount }) => (
-                <span className={alarmImgCount && (alarmImgCount === auditedImgCount) ? 'success' : ''}>
-                    {auditedImgCount}/{alarmImgCount}
-                </span>
-            )
-        },
-        {
-            key: 'view', dataIndex: 'view', title: '查看', width: 180,
+            key: 'view', dataIndex: 'view', title: '查看', width: 80,
             render: (_, record) => {
-                const { orderNo, materialId } = record;
                 return <div className="flex-box">
-                    <Button
-                        type="text"
-                        onClick={() => loadMaterialList(orderNo, materialId)}
-                    >
-                        查看历史
-                    </Button>
-                    <div className="operation-line" />
+                    {/* <div className="operation-line" /> */}
                     <Button
                         type="text"
                         onClick={() => handleViewOrder(record)}
@@ -130,7 +96,7 @@ const History = () => {
 
     return (
         <div className="page-history">
-            <PanelTitle>历史记录</PanelTitle>
+            <PanelTitle>数据统计</PanelTitle>
             <Form
                 form={form}
                 className="page-history-order-query"
@@ -198,22 +164,21 @@ const History = () => {
                 }))}
                 pagination={{
                     total: orderList.total,
-                    current: orderList.pageNum,
+                    // current: orderList.pageNum,
                     pageSize: orderList.pageSize,
                     size: 'small',
+                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+                    showQuickJumper: false,
                     showSizeChanger: false,
-                    onChange: (pageNum, pageSize) => loadOrderList({ pageNum, pageSize })
+                    // onChange: (pageNum, pageSize) => loadOrderList({ pageNum, pageSize })
                 }}
-                scroll={{ y: curHeight - 330 }}
+                scroll={{ y: curHeight - 350 }}
             />
-            <ImgDrawer />
-
             {
                 isObject(imgModalData) && !isEmpty(imgModalData) ?
                     <ImgModal
                         data={imgModalData}
                         onCancel={() => {
-                            setProcessResult({});
                             setImgModalData({});
                         }}
                     />

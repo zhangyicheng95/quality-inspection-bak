@@ -141,14 +141,14 @@ const DataStatistics = () => {
     };
 
     return (
-        <div className="page-history">
+        <div className="page-dataStatistics">
             {
                 isIframe ? null :
                     <Fragment>
                         <PanelTitle>数据统计</PanelTitle>
                         <Form
                             form={form}
-                            className="page-history-order-query"
+                            className="page-dataStatistics-order-query"
                             initialValues={{}}
                             onFinish={(values) => {
                                 setTimeRange(values.timeRange);
@@ -158,7 +158,7 @@ const DataStatistics = () => {
                             <div className="left-ghost top" />
                             <div className="left-ghost bottom" />
                             <Row gutter={24}>
-                                <Col span={7} className="statistic-btn-box">
+                                {/* <Col span={7} className="statistic-btn-box">
                                     <div
                                         className={classNames("statistic-btn", { active: currentType === 'order' })}
                                         onClick={() => onTabsChange('order')}
@@ -177,8 +177,8 @@ const DataStatistics = () => {
                                     >
                                         缺陷维度
                                     </div>
-                                </Col>
-                                <Col span={7} offset={2}>
+                                </Col> */}
+                                <Col span={16}>
                                     <Form.Item label="发生时间" name="timeRange" >
                                         <RangePicker
                                             showTime
@@ -214,7 +214,7 @@ const DataStatistics = () => {
                         </Form>
                     </Fragment>
             }
-            <div className="page-history-order-list flex-box" style={isIframe ? { height: '100%', margin: 0 } : {}}>
+            <div className="page-dataStatistics-order-list flex-box" style={isIframe ? { height: '100%', margin: 0 } : {}}>
                 <div className="left">
                     {
                         // @ts-ignore

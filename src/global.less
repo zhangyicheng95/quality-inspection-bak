@@ -4,6 +4,11 @@ html,
 body,
 #root {
     height: 100%;
+    overscroll-behavior: none;
+
+    * {
+        box-sizing: border-box;
+    }
 }
 
 .colorWeak {
@@ -674,4 +679,18 @@ body .ant-form>div:not(.ant-pro-form-light-filter) .pro-field-md {
     display: -ms-flex;
     -webkit-align-items: center;
     align-items: center;
+}
+
+.flex-box-column {
+    display: flex;
+    display: -ms-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.flex-box-center {
+    display: flex;
+    display: -ms-flex;
+    align-items: center;
+    justify-content: center;
 }

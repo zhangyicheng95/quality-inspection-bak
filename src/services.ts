@@ -7,7 +7,7 @@ const BASE_IP = (href.indexOf('iframe') > -1 || pathname !== '/') ? `${origin + 
  *  历史数据
  **/
 // 列表
-export const queryOrderList = data => request(`${BASE_IP}track/order/list/v1`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, data });
+export const queryOrderList = (data?: any) => request(`${BASE_IP}track/order/list/v1`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, data });
 // 查看历史
 export const getOrderDetail = params => request(`${BASE_IP}track/order/post/detail`, { method: 'GET', headers: { 'Content-Type': 'application/json' }, params });
 // 获取物料位置数据

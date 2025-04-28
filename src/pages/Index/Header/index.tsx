@@ -49,29 +49,13 @@ const Header: React.FC = () => {
                 }</span>
             </div>
             <div className="right">
-                {/* <div
-                    className={classNames("btn btn1", { active: pathname === '/setting' })}
-                    onClick={() => history.push('/setting')}
-                >
-                    <div className="bg1" />
-                    <div className="bg2" />
-                    设置
-                </div> */}
-                <div
-                    className={classNames("btn btn-data", { active: pathname === '/dataStatistics' })}
-                    onClick={() => history.push('/dataStatistics')}
-                >
-                    {/* <div className="bg1" />
-                    <div className="bg2" /> */}
-                    数据统计
-                </div>
                 <div
                     className={classNames("btn btn1", { active: pathname === '/realtime' })}
                     onClick={() => history.push('/realtime')}
                 >
                     <div className="bg1" />
                     <div className="bg2" />
-                    实时结果
+                    结果汇总
                 </div>
                 <div
                     className={classNames("btn btn2", { active: pathname === '/history' })}
@@ -79,7 +63,7 @@ const Header: React.FC = () => {
                 >
                     <div className="bg1" />
                     <div className="bg2" />
-                    历史查询
+                    数据统计
                 </div>
             </div>
             {settingVisible ? (
